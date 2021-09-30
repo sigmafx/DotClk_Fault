@@ -1,5 +1,5 @@
 // Library Includes
-#include <SdFat.h>
+#include <SD.h>
 #include "Scene.h"
 
 typedef char FILENAME[8+1+3+1];
@@ -9,8 +9,8 @@ FILENAME *sceneNames = NULL;
 uint16_t cntScenes = 0;
 
 // SD Card
-//SdFatSdioEX* SD = NULL;
-SdFatSdioEX SD;
+//SdFat* SD = NULL;
+//SD sd;
 
 const int ledPin = 13;
 
@@ -22,8 +22,8 @@ void setup()
   pinMode(ledPin, OUTPUT);
   
   // Serial debug
-  //Serial.begin(115200);
-  //while(!Serial);
+  Serial.begin(115200);
+  while(!Serial);
 
   // Randomize the generator
   randomSeed(analogRead(32));
@@ -33,6 +33,7 @@ void setup()
   {  
     // Init the scene file name list
     InitScenes();
+    Serial.println(cntScenes);
   }
 }
 
@@ -60,7 +61,7 @@ void loop()
 //------------------
 void doClock()
 {
-  static SdFile fileScene ;
+  static FsFile fileScene ;
   static Scene scene;
 
   if(cntScenes > 0 && !fileScene.isOpen())
@@ -71,7 +72,8 @@ void doClock()
     sprintf(pathScene, "/Scenes/%s", sceneNames[random(cntScenes)]);
 
     // Open the scene file
-    if(fileScene.open(pathScene, O_RDONLY))
+    fileScene = SD.sdfs.open(pathScene, O_RDONLY);
+    if(fileScene.isOpen())
     {
       // Creste the scene object from the scene file
       if(!scene.Create(fileScene))
@@ -107,14 +109,14 @@ void doClock()
 //-----------------
 bool InitSD()
 {
-    return SD.begin() && SD.exists("/Scenes");
+    return SD.sdfs.begin(SdioConfig(DMA_SDIO)) && SD.exists("/Scenes");
 }
 
-//bool InitSD2()
+//bool InitSD()
 //{
 //  if(SD == NULL)
 //  {
-//    SD = new SdFatSdioEX;
+//    SD = new SdFat;
 
     // Connect to SD Card
     // Return whether we can see the Scenes directory
@@ -136,7 +138,7 @@ bool InitSD()
 //    delete SD;
 //    SD = NULL;
 //  }
-//
+
 //  return InitSD();
 //}
 
@@ -145,11 +147,12 @@ bool InitSD()
 //---------------------
 void InitScenes()
 {
-  SdFile dirScenes;
-  SdFile file ;
+  FsFile dirScenes;
+  FsFile file ;
 
   // Scene directory exists?
-  if(dirScenes.open("/Scenes", O_RDONLY))
+  dirScenes = SD.sdfs.open("/Scenes", O_RDONLY);
+  if(dirScenes.isOpen())
   {
     // Previous list exists?
     if(sceneNames != NULL)
@@ -203,4 +206,3 @@ void InitScenes()
     dirScenes.close();
   }
 }
-

@@ -1,7 +1,7 @@
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-#include <SdFat.h>
+#include <SD.h>
 #include "Dotmap.h"
 
 class Scene
@@ -34,9 +34,9 @@ class Scene
     Scene();
     ~Scene();
 
-    bool Create(SdFile& fileScene);
+    bool Create(FsFile& fileScene);
     bool Eof();
-    bool NextFrame(SdFile& fileScene);
+    bool NextFrame(FsFile& fileScene);
     Dotmap& GetFrameDotmap();
     unsigned long GetFrameDelay();
     uint16_t GetFrameLayer();
@@ -46,4 +46,3 @@ class Scene
 };
 
 #endif
-

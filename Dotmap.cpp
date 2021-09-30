@@ -83,7 +83,7 @@ void Dotmap::Create(int width, int height)
 //-----------------
 // Function: Create
 //-----------------
-bool Dotmap::Create(SdFile& fileDotmap)
+bool Dotmap::Create(FsFile& fileDotmap)
 {
   bool ret = true;
   uint16_t dotsWidth;
@@ -369,4 +369,3 @@ void Dotmap::Delete()
   }
 }
 // End of file
-
